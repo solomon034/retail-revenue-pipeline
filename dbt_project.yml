@@ -1,0 +1,25 @@
+name: retail_revenue
+version: 1.0.0
+config-version: 2
+
+profile: retail_revenue
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]
+
+models:
+  retail_revenue:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table
+
+seeds:
+  retail_revenue:
+    +quote_columns: false
+

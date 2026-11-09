@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: fct_orders
+    description: Analytics-ready order fact with recognized revenue semantics.
+    config:
+      meta:
+        owner: analytics_engineering
+        grain: one row per order
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: recognized_revenue
+        description: Net payment amount only when the order is completed.
+        data_tests: [not_null]
+  - name: dim_customers
+    description: Customer dimension enriched with lifetime commerce metrics.
+    config:
+      meta:
+        owner: analytics_engineering
+        grain: one row per customer
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: lifetime_revenue
+        data_tests: [not_null]
+

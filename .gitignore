@@ -1,0 +1,16 @@
+.venv/
+.venv312/
+__pycache__/
+*.py[cod]
+target/
+logs/
+dbt_packages/
+warehouse/*.db
+.env
+.env.*
+!.env.example
+!.env.*.example
+credentials.json
+profiles.local.yml
+.user.yml
+

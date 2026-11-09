@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Clean, typed customer records at one row per customer.
+    columns:
+      - name: customer_id
+        data_tests: [unique, not_null]
+      - name: country_code
+        data_tests: [not_null]
+  - name: stg_orders
+    description: Clean order headers at one row per order.
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['completed', 'pending', 'returned']
+  - name: stg_payments
+    description: Clean payment events; refund rows carry negative amounts.
+    columns:
+      - name: payment_id
+        data_tests: [unique, not_null]
+

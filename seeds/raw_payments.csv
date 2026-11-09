@@ -1,0 +1,9 @@
+payment_id,order_id,payment_method,amount
+5001,1001,card,125.50
+5002,1002,paypal,79.99
+5003,1003,card,-45.00
+5004,1004,card,210.00
+5005,1005,bank_transfer,60.00
+5006,1006,card,99.50
+5007,1007,paypal,40.00
+5008,1007,gift_card,15.00
