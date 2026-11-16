@@ -18,18 +18,45 @@ my understanding of the SQL, dbt workflow, and tests.
 - Builds fct_orders and dim_customers.
 - Runs data-quality checks and prints a revenue summary through Python.
 
+## Pipeline diagram
+
+All three inputs are synthetic CSV files. dbt loads them into SQLite, cleans them
+in staging views, and builds the two final reports.
+
 ```mermaid
-flowchart LR
-  A[CSV extracts] -->|dbt seed| B[(SQLite raw tables)]
-  B --> C[stg_customers]
-  B --> D[stg_orders]
-  B --> E[stg_payments]
-  D --> F[int_order_payments]
-  E --> F
-  C --> G[dim_customers]
-  F --> G
-  F --> H[fct_orders]
+flowchart TD
+  csv["Synthetic CSV files<br/>Customers, orders, payments"] -->|"dbt seed"| raw[("SQLite raw tables")]
+
+  subgraph staging["Staging cleanup"]
+    customers["stg_customers"]
+    orders["stg_orders"]
+    payments["stg_payments"]
+  end
+  raw --> customers
+  raw --> orders
+  raw --> payments
+
+  subgraph intermediate["int_order_payments.sql"]
+    rollup["Group payments by order_id<br/>Sum amounts and count payment events"]
+    matched["Left join grouped payments to orders<br/>Keep one row per order"]
+    rollup --> matched
+  end
+  payments --> rollup
+  orders --> matched
+
+  matched --> order_report["fct_orders<br/>Order report and revenue rule"]
+  matched --> customer_report["dim_customers<br/>Order count and revenue per customer"]
+  customers --> customer_report
 ```
+
+Grouping payments before the join keeps order 1007's two payment events attached
+to one order. Both final reports read the order-level intermediate model;
+`dim_customers` also joins the cleaned customer records.
+
+The Python runner executes `dbt seed`, `dbt run`, and `dbt test`, then queries
+`fct_orders` to print revenue by order status. This diagram shows the local
+workflow that exists; it does not include a scheduler, dashboard, or external
+warehouse.
 
 ## Data
 
